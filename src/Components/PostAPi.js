@@ -1,92 +1,73 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { Table } from "antd";
+import { Button, Form, Input, Space, Table } from "antd";
+import "./api.css";
+import TableAntD from "./TableAntD";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [userData, setUserData] = useState([]);
+  const [sendData, setSendData] = useState("");
+  console.log(sendData);
+  const navigate = useNavigate();
 
-  console.log(userData);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
       const response = await axios.post("http://localhost:3200/", {
         name,
-        password,
         phone,
+        password,
       });
 
-      console.log(response.data, "fghjkhgh");
-
-      console.log(name, "hererer herer");
+      if (response.status === 200) {
+        setSendData(response.data);
+      }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
+    // navigate("./TableAntD.js");
   };
-
-  useEffect(() => {
-    console.log("name", name);
-    axios.get(`http://localhost:3200`).then((data) => {
-      console.log(data, "useEfeect call");
-      setUserData(data.data);
-    });
-  }, []);
-  const columns = [
-    {
-      key: "name",
-      title: "name",
-      dataIndex: "name",
-    },
-    {
-      key: "password",
-      title: "Password",
-      dataIndex: "password",
-    },
-    {
-      key: "phone",
-      title: "Phone",
-      dataIndex: "phone",
-    },
-  ];
-
+  
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username:</label>
-          <input
+      <Form className="main" onFinish={handleSubmit}>
+        <Form.Item name="name" label="userName">
+          <Input
             type="text"
             id="username"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
+        </Form.Item>
+
+        <Form.Item name="password" label="PASSWORD">
+          <Input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-        <div>
-          <label htmlFor="phone">Phone:</label>
-          <input
+        </Form.Item>
+        <Form.Item name="phone" label="Phone">
+          <Input
             type="phone"
             id="phone"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
-        </div>
-        <button type="submit">Login</button>
-      </form>
+        </Form.Item>
+        <Form.Item>
+          {/* <Link to="/table"> */}
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+          {/* </Link> */}
+        </Form.Item>
+      </Form>
       <div>
-        <Table columns={columns} dataSource={userData} />
+        <TableAntD sendData={sendData} />
       </div>
     </>
   );
